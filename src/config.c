@@ -86,6 +86,7 @@ static uint32_t parse_char(const char *filename, size_t lineno, const char *str,
 static struct color parse_color(const char *filename, size_t lineno, const char *str, bool *err);
 static uint32_t parse_uint32(const char *filename, size_t lineno, const char *str, bool *err);
 static int32_t parse_int32(const char *filename, size_t lineno, const char *str, bool *err);
+static double parse_double(const char *filename, size_t lineno, const char *str, bool *err);
 static struct uint32_percent parse_uint32_percent(const char *filename, size_t lineno, const char *str, bool *err);
 static struct directional parse_directional(const char *filename, size_t lineno, const char *str, bool *err);
 
@@ -343,8 +344,8 @@ bool parse_option(struct tofi *tofi, const char *filename, size_t lineno, const 
 			snprintf(tofi->window.entry.font_name, N_ELEM(tofi->window.entry.font_name), "%s", value);
 		}
 	} else if (strcasecmp(option, "font-size") == 0) {
-		uint32_t val =  parse_uint32(filename, lineno, value, &err);
-		if (val == 0) {
+		double val =  parse_double(filename, lineno, value, &err);
+		if (val <= 0) {
 			err = true;
 			PARSE_ERROR(filename, lineno, "Option \"%s\" must be greater than 0.\n", option);
 		} else {
@@ -1069,6 +1070,57 @@ int32_t parse_int32(const char *filename, size_t lineno, const char *str, bool *
 		}
 	}
 	return ret;
+}
+
+
+double parse_double(const char *filename, size_t lineno, const char *str, bool *err)
+{
+	errno = 0;
+	char *endptr;
+	
+	char *str_copy = strdup(str);
+	if (!str_copy) {
+		PARSE_ERROR(filename, lineno, "Memory allocation failed while parsing \"%s\".\n", str);
+		if (err) *err = true;
+		return 0.0;
+	}
+	
+	char *before_dot = strtok(str_copy, ".");
+	char *after_dot = strtok(NULL, ".");
+
+	double result = (double)strtol(before_dot, &endptr, 10);
+
+	if (endptr == before_dot || *endptr != '\0') {
+		PARSE_ERROR(filename, lineno, "Failed to parse \"%s\" as integer part of float.\n", str);
+		if (err) *err = true;
+		free(str_copy);
+		return 0.0;
+	}
+
+	if (after_dot) {
+		int i;
+		char digit[2] = { 0 };
+		for (i = 0; after_dot[i]; i++) {
+			digit[0] = after_dot[i];
+			result += strtol(digit, &endptr, 10) * pow(10, -(i + 1));
+			if (endptr == digit || *endptr != '\0') {
+				PARSE_ERROR(filename, lineno, "Failed to parse fractional part \"%s\" of \"%s\".\n", digit, str);
+				if (err) *err = true;
+				free(str_copy);
+				return 0.0;
+			}
+		}
+	}
+
+	if (errno || result < -DBL_MAX || result > DBL_MAX) {
+		PARSE_ERROR(filename, lineno, "Double value \"%s\" out of range.\n", str);
+		if (err) *err = true;
+		free(str_copy);
+		return 0.0;
+	}
+
+	free(str_copy);
+	return result;
 }
 
 struct uint32_percent parse_uint32_percent(const char *filename, size_t lineno, const char *str, bool *err)

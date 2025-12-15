@@ -465,7 +465,7 @@ void entry_backend_harfbuzz_init(
 {
 	struct entry_backend_harfbuzz *hb = &entry->harfbuzz;
 	cairo_t *cr = entry->cairo[0].cr;
-	uint32_t font_size = floor(entry->font_size * PT_TO_DPI);
+	double font_size = floor(entry->font_size * PT_TO_DPI);
 	cairo_surface_get_device_scale(entry->cairo[0].surface, &hb->scale, NULL);
 
 	/*
