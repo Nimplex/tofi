@@ -12,7 +12,8 @@
 
 static uint32_t keysym_to_key(xkb_keysym_t sym);
 static void add_character(struct tofi *tofi, xkb_keycode_t keycode);
-static void delete_character(struct tofi *tofi);
+static void delete_prev_character(struct tofi *tofi);
+static void delete_next_character(struct tofi *tofi);
 static void delete_word(struct tofi *tofi);
 static void clear_input(struct tofi *tofi);
 static void paste(struct tofi *tofi);
@@ -65,7 +66,10 @@ void input_handle_keypress(struct tofi *tofi, xkb_keycode_t keycode)
 		delete_word(tofi);
 	} else if (key == KEY_BACKSPACE
 			|| (key == KEY_H && ctrl)) {
-		delete_character(tofi);
+		delete_prev_character(tofi);
+	} else if (key == KEY_DELETE
+			|| (key == KEY_L && ctrl)) {
+		delete_next_character(tofi);
 	} else if (key == KEY_U && ctrl) {
 		clear_input(tofi);
 	} else if (key == KEY_V && ctrl) {
@@ -115,6 +119,8 @@ static uint32_t keysym_to_key(xkb_keysym_t sym)
 	switch (sym) {
 		case XKB_KEY_BackSpace:
 			return KEY_BACKSPACE;
+		case XKB_KEY_Delete:
+			return KEY_DELETE;
 		case XKB_KEY_w:
 			return KEY_W;
 		case XKB_KEY_u:
@@ -249,7 +255,7 @@ void input_refresh_results(struct tofi *tofi)
 	reset_selection(tofi);
 }
 
-void delete_character(struct tofi *tofi)
+void delete_prev_character(struct tofi *tofi)
 {
 	struct entry *entry = &tofi->window.entry;
 
@@ -269,6 +275,28 @@ void delete_character(struct tofi *tofi)
 			entry->input_utf32[i] = entry->input_utf32[i + 1];
 		}
 		entry->cursor_position--;
+		entry->input_utf32_length--;
+		entry->input_utf32[entry->input_utf32_length] = U'\0';
+	}
+
+	input_refresh_results(tofi);
+}
+
+void delete_next_character(struct tofi *tofi) 
+{
+	struct entry *entry = &tofi->window.entry;
+
+	if (entry->input_utf32_length == 0) {
+		/* No input to delete. */
+		return;
+	}
+
+	if (entry->cursor_position == entry->input_utf32_length) {
+		return;
+	} else {
+		for (size_t i = entry->cursor_position + 1; i < entry->input_utf32_length - 1; i++) {
+			entry->input_utf32[i] = entry->input_utf32[i + 1];
+		}
 		entry->input_utf32_length--;
 		entry->input_utf32[entry->input_utf32_length] = U'\0';
 	}
