@@ -23,6 +23,7 @@ void is_match(const char *pattern, const char *str, const char *message)
 	is_single_match(MATCHING_ALGORITHM_NORMAL, pattern, str, message);
 	is_single_match(MATCHING_ALGORITHM_PREFIX, pattern, str, message);
 	is_single_match(MATCHING_ALGORITHM_FUZZY, pattern, str, message);
+	is_single_match(MATCHING_ALGORITHM_COMMAND, pattern, str, message);
 }
 
 void isnt_match(const char *pattern, const char *str, const char *message)
@@ -30,6 +31,7 @@ void isnt_match(const char *pattern, const char *str, const char *message)
 	isnt_single_match(MATCHING_ALGORITHM_NORMAL, pattern, str, message);
 	isnt_single_match(MATCHING_ALGORITHM_PREFIX, pattern, str, message);
 	isnt_single_match(MATCHING_ALGORITHM_FUZZY, pattern, str, message);
+	isnt_single_match(MATCHING_ALGORITHM_COMMAND, pattern, str, message);
 }
 
 int main(int argc, char *argv[])

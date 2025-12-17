@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include "matching.h"
 #include "tofi.h"
 #include "color.h"
 #include "config.h"
@@ -689,15 +690,7 @@ bool parse_option(struct tofi *tofi, const char *filename, size_t lineno, const 
 	} else if (strcasecmp(option, "matching-algorithm") == 0) {
 		enum matching_algorithm val = parse_matching_algorithm(filename, lineno, value, &err);
 		if (!err) {
-			tofi->matching_algorithm= val;
-		}
-	} else if (strcasecmp(option, "fuzzy-match") == 0) {
-		log_warning("The \"fuzzy-match\" option is deprecated, and may be removed in future. Please switch to \"matching-algorithm\".\n");
-		bool val = parse_bool(filename, lineno, value, &err);
-		if (!err) {
-			if (val) {
-				tofi->matching_algorithm = MATCHING_ALGORITHM_FUZZY;
-			}
+			tofi->matching_algorithm = val;
 		}
 	} else if (strcasecmp(option, "require-match") == 0) {
 		bool val = parse_bool(filename, lineno, value, &err);
@@ -1008,12 +1001,12 @@ enum matching_algorithm parse_matching_algorithm(const char *filename, size_t li
 {
 	if(strcasecmp(str, "normal") == 0) {
 		return MATCHING_ALGORITHM_NORMAL;
-	}
-	if(strcasecmp(str, "fuzzy") == 0) {
+	} else if(strcasecmp(str, "fuzzy") == 0) {
 		return MATCHING_ALGORITHM_FUZZY;
-	}
-	if(strcasecmp(str, "prefix") == 0) {
+	} else if(strcasecmp(str, "prefix") == 0) {
 		return MATCHING_ALGORITHM_PREFIX;
+	} else if (strcasecmp(str, "command") == 0) {
+		return MATCHING_ALGORITHM_COMMAND;
 	}
 	PARSE_ERROR(filename, lineno, "Invalid matching algorithm \"%s\".\n", str);
 	if (err) {

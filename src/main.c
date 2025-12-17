@@ -13,6 +13,7 @@
 #include <wayland-client.h>
 #include <wayland-util.h>
 #include <xkbcommon/xkbcommon.h>
+#include "src/matching.h"
 #include "tofi.h"
 #include "compgen.h"
 #include "drun.h"
@@ -1048,7 +1049,20 @@ static bool do_submit(struct tofi *tofi)
 				}
 			}
 		} else {
-			printf("%s\n", res);
+			if (entry->input_utf8_length > strlen(res)) {
+				char *input = entry->input_utf8;
+				size_t res_len = strlen(res);
+				char *args = NULL;
+				if (strlen(input) > res_len) {
+					args = input + res_len;
+					while (*args == ' ') args++;
+				} else {
+					args = "";
+				}
+				printf("%s %s\n", res, args);
+			} else {
+				printf("%s\n", res);
+			}
 		}
 	}
 	if (tofi->use_history) {
