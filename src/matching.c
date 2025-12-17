@@ -19,6 +19,10 @@ static int32_t prefix_match_words(
 		const char *restrict patterns,
 		const char *restrict str);
 
+static int32_t command_match_words(
+		const char *restrict patterns,
+		const char *restrict str);
+
 static int32_t fuzzy_match_words(
 		const char *restrict patterns,
 		const char *restrict str);
@@ -56,6 +60,8 @@ int32_t match_words(
 			return prefix_match_words(patterns, str);
 		case MATCHING_ALGORITHM_FUZZY:
 			return fuzzy_match_words(patterns, str);
+		case MATCHING_ALGORITHM_COMMAND:
+			return command_match_words(patterns, str);
 		default:
 			return INT32_MIN;
 	}
@@ -111,6 +117,27 @@ int32_t prefix_match_words(const char *restrict patterns, const char *restrict s
 	return score;
 }
 
+/*
+ * Split patterns into words, treat the first as the command and perform
+ * matching, against it. If a word is not found, returns INT32_MIN.
+ */
+int32_t command_match_words(const char *patterns, const char *str) {
+    if (!patterns || !*patterns)
+        return INT32_MIN;
+
+    size_t len = 0;
+    while (patterns[len] && patterns[len] != ' ')
+        len++;
+
+    if (len == 0)
+        return INT32_MIN;
+
+    char first_word[len + 1];
+    memcpy(first_word, patterns, len);
+    first_word[len] = '\0';
+
+    return simple_match_words(first_word, str);
+}
 
 /*
  * Split patterns into words, and return the sum of fuzzy_match(word, str).

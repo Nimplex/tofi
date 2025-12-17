@@ -6,7 +6,8 @@
 enum matching_algorithm {
 	MATCHING_ALGORITHM_NORMAL,
 	MATCHING_ALGORITHM_PREFIX,
-	MATCHING_ALGORITHM_FUZZY
+	MATCHING_ALGORITHM_FUZZY,
+	MATCHING_ALGORITHM_COMMAND
 };
 
 int32_t match_words(enum matching_algorithm algorithm, const char *restrict patterns, const char *restrict str);

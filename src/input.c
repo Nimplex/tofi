@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "input.h"
 #include "log.h"
+#include "matching.h"
 #include "nelem.h"
 #include "tofi.h"
 #include "unicode.h"
@@ -201,6 +202,10 @@ void add_character(struct tofi *tofi, xkb_keycode_t keycode)
 			struct string_ref_vec results = desktop_vec_filter(&entry->apps, entry->input_utf8, tofi->matching_algorithm);
 			string_ref_vec_destroy(&entry->results);
 			entry->results = results;
+		} else if (entry->mode == TOFI_MODE_RUN) {
+			struct string_ref_vec tmp = entry->results;
+			entry->results = string_ref_vec_filter(&entry->results, entry->input_utf8, MATCHING_ALGORITHM_COMMAND);
+			string_ref_vec_destroy(&tmp);
 		} else {
 			struct string_ref_vec tmp = entry->results;
 			entry->results = string_ref_vec_filter(&entry->results, entry->input_utf8, tofi->matching_algorithm);
