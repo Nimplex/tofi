@@ -1,4 +1,4 @@
-# Tofi
+# Tofi (fork)
 
 An extremely fast and simple [dmenu](https://tools.suckless.org/dmenu/) /
 [rofi](https://github.com/davatorium/rofi) replacement for
@@ -14,6 +14,7 @@ single frame.
 ![](screenshot_fullscreen.png)
 
 ## Table of Contents
+* [What's new](#whats-new)
 * [Install](#install)
   * [Building](#building)
   * [Arch](#arch)
@@ -24,6 +25,11 @@ single frame.
   * [Benchmarks](#benchmarks)
   * [Where is the time spent?](#where-is-the-time-spent)
 
+## What's new
+* Implemented `DELETE` key logic (thanks to @F-4Dev)
+* Added fractional font-size support (for example Departure Mono is 8.5pt (11px) on 96DPI)
+* Added raw shell commands in run mode. Tofi will now return full command string with arguments passed by the user.
+* Added `TAB` completions (thanks to @achuie and @rdao)
 ## Install
 ### Building
 
