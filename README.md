@@ -26,10 +26,10 @@ single frame.
   * [Where is the time spent?](#where-is-the-time-spent)
 
 ## What's new
-* Implemented `DELETE` key logic (thanks to @F-4Dev)
+* Implemented `DELETE` key logic (thanks to [@F-4Dev](https://github.com/F-4Dev))
 * Added fractional font-size support (for example Departure Mono is 8.5pt (11px) on 96DPI)
 * Added raw shell commands in run mode. Tofi will now return full command string with arguments passed by the user.
-* Added `TAB` completions (thanks to @achuie and @rdao)
+* Added `TAB` completions (thanks to [@achuie](https://github.com/achuie) and [@rdap](https://github.com/rdap))
 ## Install
 ### Building
 
